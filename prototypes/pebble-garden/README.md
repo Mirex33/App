@@ -8,6 +8,8 @@ Prototype goals:
 
 - Test whether placing colored pebbles feels immediately understandable.
 - Demonstrate group clearing with three or more connected pebbles.
+- Show cleared cells growing from soil into sprouts and flowers.
+- Seed one opening sprout so the first clear blooms into a visible flower.
 - Show a calmer, more tactile direction than the route-based prototype.
 - Keep the rules simple enough for a first iPhone game.
 
