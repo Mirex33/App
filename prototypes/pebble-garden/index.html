@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pebble Garden Prototype</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell" aria-label="Pebble Garden mechanics prototype">
+      <section class="game-surface">
+        <header class="top-bar">
+          <div>
+            <p class="eyebrow">Mechanics Prototype</p>
+            <h1>Pebble Garden</h1>
+          </div>
+          <div class="score-panel" aria-live="polite">
+            <span>Score</span>
+            <strong id="score">0</strong>
+          </div>
+        </header>
+
+        <section class="status-row" aria-live="polite">
+          <p id="message">Place the red pebble next to the two red pebbles to clear the group.</p>
+          <button id="new-game" class="text-button" type="button">New Board</button>
+        </section>
+
+        <section class="board-wrap">
+          <div id="board" class="board" aria-label="Pebble Garden board"></div>
+        </section>
+
+        <section class="tray-area" aria-label="Pebble tray">
+          <div class="tray-header">
+            <span>Pebble Tray</span>
+            <span id="round-label">Round 1</span>
+          </div>
+          <div id="tray" class="tray"></div>
+        </section>
+
+        <footer class="controls-note">
+          <span>Select pebble</span>
+          <span>Place on soil</span>
+          <span>Clear groups of 3+</span>
+        </footer>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
