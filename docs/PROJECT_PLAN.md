@@ -1,194 +1,194 @@
 # iPhone Puzzle Game Project Plan
 
-## Цель
+## Goal
 
-Сделать первое простое iPhone-приложение для App Store: короткую офлайн-головоломку, в которую удобно играть одной рукой в дороге. Первая версия должна быть маленькой, законченной и достаточно отполированной, чтобы ее можно было показать, протестировать и подготовить к публикации.
+Build a first simple iPhone app for the App Store: a short offline puzzle game that is easy to play one-handed while commuting. The first release should be small, complete, polished enough to test, and realistic to prepare for App Store submission.
 
-## Рабочая гипотеза продукта
+## Product Hypothesis
 
-Игра: спокойная логическая головоломка на 30-90 секунд.
+Game: a calm logic puzzle designed for 30-90 second sessions.
 
-Базовая идея для исследования: игрок размещает, поворачивает или соединяет элементы на сетке так, чтобы очистить поле, собрать маршрут или выполнить компактную цель уровня. Формула должна объединять сильные стороны популярных casual puzzle игр: быстрый старт, понятные правила, короткую партию, приятную обратную связь, рост сложности и желание сразу попробовать еще раз.
+Research direction: the player places, rotates, or connects pieces on a grid to clear space, complete routes, or solve a compact objective. The formula should combine the strongest traits of popular casual puzzle games: instant start, clear rules, short rounds, satisfying feedback, gradual difficulty, and the urge to retry immediately.
 
-## Основные направления работы
+## Workstreams
 
-### 1. Концепция
+### 1. Concept
 
-Цель: выбрать игровую формулу, которая достаточно простая для первой версии, но не выглядит как прямой клон.
+Goal: choose a game formula that is simple enough for a first version but does not feel like a direct clone.
 
-Задачи:
-- Изучить топ casual puzzle игр и выделить механики удержания.
-- Сформулировать 3-5 оригинальных концепций.
-- Выбрать одну концепцию для MVP.
-- Описать правила игры, условия победы/проигрыша и базовый игровой цикл.
-- Решить, будет ли игра уровневой, бесконечной или гибридной.
+Tasks:
+- Study top casual puzzle games and identify retention mechanics.
+- Propose 3-5 original game concepts.
+- Select one concept for the MVP.
+- Define rules, win/loss conditions, and the core game loop.
+- Decide whether the first version uses levels, endless mode, or a hybrid structure.
 
-Результат:
-- `Game Concept Brief`: название рабочей идеи, core loop, правила, примеры уровней, что делает игру интересной.
+Deliverable:
+- `Game Concept Brief`: working title, core loop, rules, sample levels, and the reason the game is interesting.
 
-### 2. Дизайн
+### 2. Design
 
-Цель: выбрать визуальное направление и сделать первый UI/UX достаточно понятным для разработки.
+Goal: choose a visual direction and define enough UI/UX detail for development.
 
-Задачи:
-- Подобрать 3-4 визуальных направления.
-- Выбрать стиль: минималистичный, cozy/tactile, dark neon или bright casual.
-- Описать палитру, типографику, форму элементов, настроение.
-- Нарисовать схему экранов: меню, игра, пауза, результат, настройки.
-- Подготовить иконку-прототип и базовые ассеты.
+Tasks:
+- Explore 3-4 visual directions.
+- Choose a style: minimal, cozy/tactile, dark neon, or bright casual.
+- Define palette, typography, element shapes, and mood.
+- Map the main screens: menu, gameplay, pause, result, and settings.
+- Prepare a prototype app icon and basic assets.
 
-Результат:
-- `Design Direction`: moodboard, палитра, UI screens, список ассетов.
+Deliverable:
+- `Design Direction`: moodboard, palette, UI screens, and asset list.
 
-### 3. Разработка
+### 3. Development
 
-Цель: собрать нативный iOS MVP.
+Goal: build a native iOS MVP.
 
-Технологический выбор по умолчанию:
-- SwiftUI для меню, настроек и экранов результата.
-- SpriteKit или Canvas/SwiftUI для игрового поля.
-- Локальное хранение рекорда и настроек через `UserDefaults`.
-- Без сервера, аккаунтов, платежей и рекламы в первой версии.
+Default technology choices:
+- SwiftUI for menus, settings, and result screens.
+- SpriteKit or SwiftUI Canvas for the gameplay board.
+- `UserDefaults` for local high score and settings storage.
+- No server, account system, payments, or ads in the first version.
 
-Задачи:
-- Создать Xcode iOS project.
-- Собрать навигацию экранов.
-- Реализовать игровой движок MVP.
-- Добавить счет, рекорд, рестарт, паузу.
-- Добавить звуки, haptics и базовые анимации.
-- Сохранить настройки звука/вибрации.
-- Подготовить App icon и launch screen.
+Tasks:
+- Create the Xcode iOS project.
+- Build screen navigation.
+- Implement the MVP game engine.
+- Add score, high score, restart, and pause.
+- Add sound, haptics, and basic animations.
+- Persist sound and haptic settings.
+- Prepare app icon and launch screen.
 
-Результат:
-- Рабочая сборка на iPhone Simulator и, по возможности, на реальном iPhone.
+Deliverable:
+- A working build on iPhone Simulator and, if available, a real iPhone.
 
-### 4. Тестирование
+### 4. Testing
 
-Цель: убедиться, что игра понятна, стабильна и не раздражает.
+Goal: make sure the game is understandable, stable, and not frustrating.
 
-Задачи:
-- Проверить запуск на актуальном iPhone Simulator.
-- Проверить основные размеры экранов.
-- Проверить 10-20 игровых сессий подряд.
-- Найти места, где игрок не понимает, что делать.
-- Проверить сохранение рекорда и настроек.
-- Проверить отсутствие крашей при паузе, сворачивании приложения и рестарте.
+Tasks:
+- Verify launch on a current iPhone Simulator.
+- Check common iPhone screen sizes.
+- Run 10-20 play sessions in a row.
+- Identify where players may not understand what to do.
+- Verify high score and settings persistence.
+- Check for crashes during pause, app backgrounding, and restart.
 
-Результат:
-- Список найденных проблем и исправленная MVP-сборка.
+Deliverable:
+- A list of issues found during testing and a corrected MVP build.
 
 ### 5. App Store Preparation
 
-Цель: подготовить приложение к TestFlight и App Store Connect.
+Goal: prepare the app for TestFlight and App Store Connect.
 
-Задачи:
-- Подготовить Apple Developer Account.
-- Настроить bundle identifier.
-- Подготовить privacy answers.
-- Подготовить скриншоты для App Store.
-- Написать название, subtitle, описание и keywords.
-- Собрать архив в Xcode.
-- Загрузить сборку в App Store Connect.
-- Пройти TestFlight sanity check.
+Tasks:
+- Prepare the Apple Developer Account.
+- Configure the bundle identifier.
+- Prepare privacy answers.
+- Prepare App Store screenshots.
+- Write the app name, subtitle, description, and keywords.
+- Build an archive in Xcode.
+- Upload the build to App Store Connect.
+- Run a TestFlight sanity check.
 
-Результат:
-- Сборка готова к внешнему тесту или отправке на review.
+Deliverable:
+- A build ready for external testing or App Store review.
 
-## Веточная стратегия
+## Branch Strategy
 
-Сейчас репозиторий пустой, коммитов еще нет. Поэтому сначала нужен базовый стартовый коммит с планом и структурой проекта, а уже после него ветки.
+The project now starts from a baseline plan on `main`. Feature branches should map to concrete deliverables rather than broad departments.
 
-Рекомендуемая схема:
+Recommended branches:
 
-- `main`: стабильная базовая ветка, только проверенное состояние.
-- `codex/concept-research`: анализ рынка, механик и финальная концепция.
-- `codex/design-direction`: визуальные направления, UI, ассеты, иконка.
-- `codex/ios-foundation`: создание Xcode project и базовой архитектуры.
-- `codex/gameplay-mvp`: первая играбельная механика.
-- `codex/polish-audio-haptics`: звук, haptics, анимации, микрополировка.
-- `codex/testing-fixes`: исправления после ручного и симуляторного тестирования.
-- `codex/app-store-prep`: metadata, screenshots, privacy, TestFlight readiness.
+- `main`: stable baseline branch with reviewed work only.
+- `codex/concept-research`: market analysis, mechanics research, and final concept.
+- `codex/design-direction`: visual directions, UI, assets, and icon exploration.
+- `codex/ios-foundation`: Xcode project and base architecture.
+- `codex/gameplay-mvp`: first playable mechanic.
+- `codex/polish-audio-haptics`: sound, haptics, animation, and feel.
+- `codex/testing-fixes`: fixes from manual and simulator testing.
+- `codex/app-store-prep`: metadata, screenshots, privacy, and TestFlight readiness.
 
-Правило:
-- Ветки делать не по абстрактным отделам, а по deliverable: каждая ветка должна завершаться конкретным результатом, который можно посмотреть или проверить.
+Rule:
+- Each branch should end with something concrete that can be inspected or tested.
 
-## Backlog MVP
+## MVP Backlog
 
-### P0 - До разработки
+### P0 - Before Development
 
-- Установить Xcode.
-- Проверить `xcodebuild`, `simctl`, iPhone Simulator.
-- Выбрать концепцию игры.
-- Выбрать визуальное направление.
-- Создать первый baseline commit.
+- Install Xcode.
+- Verify `xcodebuild`, `simctl`, and iPhone Simulator.
+- Choose the game concept.
+- Choose the visual direction.
+- Create the baseline commit.
 
-### P1 - Первый играбельный прототип
+### P1 - First Playable Prototype
 
-- Создать iOS app project.
-- Сделать главный экран.
-- Сделать игровое поле.
-- Реализовать один основной жест игрока.
-- Реализовать счет или условие завершения.
-- Сделать экран результата и restart.
+- Create the iOS app project.
+- Build the main screen.
+- Build the gameplay board.
+- Implement one primary player gesture.
+- Implement score or completion logic.
+- Build the result screen and restart flow.
 
 ### P2 - MVP
 
-- Добавить прогрессию сложности.
-- Добавить сохранение рекорда.
-- Добавить настройки звука/вибрации.
-- Добавить базовую анимацию успешного хода.
-- Добавить feedback при ошибке/проигрыше.
-- Проверить на нескольких размерах iPhone.
+- Add difficulty progression.
+- Add high score persistence.
+- Add sound and haptic settings.
+- Add basic successful-move animation.
+- Add feedback for mistakes or game over.
+- Test on several iPhone sizes.
 
-### P3 - Полировка
+### P3 - Polish
 
-- Подготовить app icon.
-- Подготовить launch screen.
-- Подготовить звуки и haptics.
-- Улучшить темп партии.
-- Добавить onboarding без длинного текста.
-- Подготовить App Store screenshots.
+- Prepare the app icon.
+- Prepare the launch screen.
+- Add final sounds and haptics.
+- Improve round pacing.
+- Add onboarding without long text.
+- Prepare App Store screenshots.
 
-### Later - Не для первой версии
+### Later - Not For Version 1
 
-- Реклама.
+- Ads.
 - In-app purchases.
-- Лидерборды.
-- Синхронизация через iCloud.
-- Ежедневные задания.
-- Большая система уровней.
-- Локализации на несколько языков.
+- Leaderboards.
+- iCloud sync.
+- Daily challenges.
+- A large level system.
+- Multiple localizations.
 
-## Критерии готовности MVP
+## MVP Acceptance Criteria
 
-- Игрок может открыть приложение и начать игру за один тап.
-- Правила понятны без длинного обучения.
-- Одна партия занимает примерно 30-90 секунд.
-- После проигрыша можно сразу начать заново.
-- Рекорд сохраняется после закрытия приложения.
-- Игра не крашится при паузе, сворачивании и повторном запуске.
-- UI нормально выглядит на маленьком и большом iPhone.
-- В проекте нет сервера, логина, платежей и лишней сложности.
+- The player can open the app and start a game with one tap.
+- Rules are understandable without long tutorial text.
+- A session lasts roughly 30-90 seconds.
+- The player can restart immediately after losing.
+- The high score persists after closing the app.
+- The game does not crash on pause, backgrounding, or relaunch.
+- The UI works on small and large iPhones.
+- The project has no server, login, payments, or unnecessary complexity.
 
-## Установка и окружение
+## Setup And Environment
 
-Текущее состояние:
-- Swift установлен.
-- Полный Xcode сейчас не активен.
-- iOS Simulator сейчас недоступен.
-- Активный developer directory: `/Library/Developer/CommandLineTools`.
+Current state:
+- Swift is installed.
+- Full Xcode is not active yet.
+- iOS Simulator is not available yet.
+- Active developer directory: `/Library/Developer/CommandLineTools`.
 
-Что нужно:
-- Установить Xcode из App Store или Apple Developer Downloads.
-- Открыть Xcode один раз и принять условия.
-- Установить iOS Simulator runtime, если Xcode попросит.
-- Переключить developer directory на Xcode:
+Required:
+- Install Xcode from the App Store or Apple Developer Downloads.
+- Open Xcode once and accept the license terms.
+- Install the iOS Simulator runtime if Xcode asks.
+- Switch the developer directory to Xcode:
 
 ```sh
 sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 ```
 
-После этого проверить:
+Then verify:
 
 ```sh
 xcodebuild -version
@@ -196,30 +196,30 @@ xcrun simctl list devices available
 swift --version
 ```
 
-## Что я могу сделать сам с разрешением
+## What Codex Can Do With Permission
 
-Могу:
-- Проверять установку и окружение.
-- Запускать команды Xcode/Swift.
-- Создавать проект, файлы, ветки и коммиты.
-- Запускать тесты и симуляторные проверки, когда Xcode доступен.
-- Готовить App Store материалы в проекте.
+Can do:
+- Check installation and environment state.
+- Run Xcode and Swift commands.
+- Create project files, branches, and commits.
+- Run tests and simulator checks once Xcode is available.
+- Prepare App Store materials in the project.
 
-Не смогу полностью бесшовно сделать без участия владельца Mac:
-- Войти в Apple ID.
-- Подтвердить установку Xcode из App Store, если система требует пароль/Touch ID.
-- Принять Apple Developer Program agreement за владельца аккаунта.
-- Оплатить Apple Developer Program.
-- Подписывать юридические/privacy формы от имени владельца без подтверждения.
+Cannot fully automate without the Mac owner's participation:
+- Sign in to Apple ID.
+- Confirm Xcode installation if macOS asks for password or Touch ID.
+- Accept Apple Developer Program agreements for the account owner.
+- Pay for Apple Developer Program.
+- Submit legal or privacy forms on behalf of the owner without confirmation.
 
-## Решения, которые еще нужны
+## Decisions Still Needed
 
-1. Какой тип головоломки выбираем: соединение маршрутов, размещение блоков, очистка поля, поиск паттернов или смешанная механика?
-2. Какое визуальное направление берем первым: minimal, cozy, neon или bright casual?
-3. Хотим бесконечный score mode или уровни для первой версии?
-4. Есть ли уже Apple Developer Account?
-5. Будем ли тестировать на реальном iPhone или только на Simulator на первом этапе?
+1. Which puzzle type should the MVP use: route connection, block placement, board clearing, pattern finding, or a mixed mechanic?
+2. Which visual direction should come first: minimal, cozy, neon, or bright casual?
+3. Should version 1 use endless score mode or levels?
+4. Is an Apple Developer Account already available?
+5. Will the first tests use a real iPhone, Simulator only, or both?
 
-## Ближайший следующий шаг
+## Next Step
 
-Сделать первый baseline commit с этим планом, затем создать ветку `codex/concept-research` и на ней подготовить 3-5 концепций игры с оценкой по простоте разработки, оригинальности, удержанию и App Store рискам.
+Use the `codex/concept-research` branch to prepare 3-5 game concepts and score them by implementation simplicity, originality, retention potential, and App Store risk.
