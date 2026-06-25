@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Signal Garden Prototype</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell" aria-label="Signal Garden mechanics prototype">
+      <section class="game-surface">
+        <header class="top-bar">
+          <div>
+            <p class="eyebrow">Mechanics Prototype</p>
+            <h1>Signal Garden</h1>
+          </div>
+          <div class="score-panel" aria-live="polite">
+            <span>Score</span>
+            <strong id="score">0</strong>
+          </div>
+        </header>
+
+        <section class="status-row" aria-live="polite">
+          <p id="message">Place the straight tile in the center gap to complete the red route.</p>
+          <button id="new-game" class="text-button" type="button">New Board</button>
+        </section>
+
+        <section class="board-wrap">
+          <div id="board" class="board" aria-label="Signal Garden board"></div>
+        </section>
+
+        <section class="tray-area" aria-label="Tile tray">
+          <div class="tray-header">
+            <span>Tile Tray</span>
+            <button id="rotate" class="icon-button" type="button" aria-label="Rotate selected tile" title="Rotate selected tile">
+              <svg class="rotate-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 7v5h-5"></path>
+                <path d="M19 12a7 7 0 1 1-2.05-4.95L20 10"></path>
+              </svg>
+            </button>
+          </div>
+          <div id="tray" class="tray"></div>
+        </section>
+
+        <footer class="controls-note">
+          <span>Select a tile</span>
+          <span>Rotate</span>
+          <span>Place on an empty cell</span>
+        </footer>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
