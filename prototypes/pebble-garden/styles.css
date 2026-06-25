@@ -155,6 +155,20 @@ h1 {
   overflow: hidden;
 }
 
+.cell.growth-1 {
+  background:
+    radial-gradient(circle at 50% 54%, rgba(86, 166, 109, 0.22), transparent 34%),
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.28), transparent 30%),
+    var(--soil);
+}
+
+.cell.growth-2 {
+  background:
+    radial-gradient(circle at 50% 55%, rgba(213, 167, 67, 0.2), transparent 42%),
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.28), transparent 30%),
+    #ddcfba;
+}
+
 .cell.empty {
   cursor: pointer;
 }
@@ -165,6 +179,11 @@ h1 {
   inset: 26%;
   border-radius: 50%;
   background: rgba(104, 88, 62, 0.1);
+}
+
+.cell.growth-1.empty::after,
+.cell.growth-2.empty::after {
+  display: none;
 }
 
 .cell.clearing .pebble {
@@ -187,6 +206,8 @@ h1 {
 }
 
 .pebble {
+  position: relative;
+  z-index: 1;
   width: 72%;
   height: 72%;
   border: 1px solid rgba(54, 42, 24, 0.18);
@@ -197,6 +218,90 @@ h1 {
   box-shadow:
     inset -8px -10px 16px rgba(52, 40, 22, 0.14),
     0 7px 12px rgba(62, 47, 29, 0.16);
+}
+
+.growth-mark {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.sprout {
+  position: relative;
+  width: 34%;
+  height: 44%;
+}
+
+.sprout::before,
+.sprout::after {
+  content: "";
+  position: absolute;
+  bottom: 24%;
+  width: 58%;
+  height: 44%;
+  border-radius: 100% 0 100% 0;
+  background: #5eaa70;
+  box-shadow: inset -3px -4px 8px rgba(31, 85, 49, 0.18);
+}
+
+.sprout::before {
+  left: 0;
+  transform: rotate(-26deg);
+}
+
+.sprout::after {
+  right: 0;
+  transform: scaleX(-1) rotate(-26deg);
+}
+
+.flower {
+  position: relative;
+  width: 48%;
+  height: 48%;
+}
+
+.flower::before {
+  content: "";
+  position: absolute;
+  inset: 28%;
+  z-index: 2;
+  border-radius: 50%;
+  background: #d5a743;
+}
+
+.petal {
+  position: absolute;
+  left: 37%;
+  top: 4%;
+  width: 26%;
+  height: 40%;
+  border-radius: 50% 50% 42% 42%;
+  background: #fff1a8;
+  transform-origin: 50% 112%;
+  box-shadow: inset -3px -4px 7px rgba(169, 126, 34, 0.16);
+}
+
+.petal:nth-child(1) {
+  transform: rotate(0deg);
+}
+
+.petal:nth-child(2) {
+  transform: rotate(72deg);
+}
+
+.petal:nth-child(3) {
+  transform: rotate(144deg);
+}
+
+.petal:nth-child(4) {
+  transform: rotate(216deg);
+}
+
+.petal:nth-child(5) {
+  transform: rotate(288deg);
 }
 
 .tray-area {
