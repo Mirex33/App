@@ -15,6 +15,7 @@ const neighbors = [
 ];
 
 let board;
+let growth;
 let tray;
 let selectedIndex = 0;
 let score = 0;
@@ -25,11 +26,12 @@ const boardEl = document.querySelector("#board");
 const trayEl = document.querySelector("#tray");
 const scoreEl = document.querySelector("#score");
 const messageEl = document.querySelector("#message");
-const roundLabelEl = document.querySelector("#round-label");
+const gardenLabelEl = document.querySelector("#garden-label");
 const newGameButton = document.querySelector("#new-game");
 
 function newGame() {
   board = createBoard();
+  growth = createBoard(0);
   score = 0;
   round = 1;
   selectedIndex = 0;
@@ -41,19 +43,20 @@ function newGame() {
   board[4][4] = "green";
   board[5][1] = "yellow";
   board[1][5] = "purple";
+  growth[2][2] = 1;
 
   tray = ["red", "blue", "green"];
-  setMessage("Place the red pebble next to the two red pebbles to clear the group.");
+  setMessage("Place the red pebble next to the two red pebbles to bloom the sprout.");
   render();
 }
 
-function createBoard() {
-  return Array.from({ length: size }, () => Array.from({ length: size }, () => null));
+function createBoard(fill = null) {
+  return Array.from({ length: size }, () => Array.from({ length: size }, () => fill));
 }
 
 function render() {
   scoreEl.textContent = score;
-  roundLabelEl.textContent = `Round ${round}`;
+  gardenLabelEl.textContent = `Flowers ${countFlowers()}`;
   renderBoard();
   renderTray();
 }
@@ -66,7 +69,12 @@ function renderBoard() {
       const color = board[row][col];
       cell.type = "button";
       cell.className = color ? "cell filled" : "cell empty";
-      cell.setAttribute("aria-label", color ? `${color} pebble row ${row + 1}, column ${col + 1}` : `Empty soil row ${row + 1}, column ${col + 1}`);
+      if (growth[row][col] > 0) cell.classList.add(`growth-${growth[row][col]}`);
+      cell.setAttribute("aria-label", cellLabel(row, col, color));
+
+      if (growth[row][col] > 0) {
+        cell.appendChild(createGrowthMark(growth[row][col]));
+      }
 
       if (color) {
         cell.appendChild(createPebble(color));
@@ -77,6 +85,12 @@ function renderBoard() {
       boardEl.appendChild(cell);
     }
   }
+}
+
+function cellLabel(row, col, color) {
+  const stage = growth[row][col] === 2 ? "flower" : growth[row][col] === 1 ? "sprout" : "soil";
+  if (color) return `${color} pebble on ${stage} row ${row + 1}, column ${col + 1}`;
+  return `Empty ${stage} row ${row + 1}, column ${col + 1}`;
 }
 
 function renderTray() {
@@ -94,6 +108,29 @@ function renderTray() {
     });
     trayEl.appendChild(card);
   });
+}
+
+function createGrowthMark(stage) {
+  const mark = document.createElement("span");
+  mark.className = "growth-mark";
+
+  if (stage === 1) {
+    const sprout = document.createElement("span");
+    sprout.className = "sprout";
+    mark.appendChild(sprout);
+  } else {
+    const flower = document.createElement("span");
+    flower.className = "flower";
+    for (let i = 0; i < 5; i += 1) {
+      const petal = document.createElement("span");
+      petal.className = "petal";
+      flower.appendChild(petal);
+    }
+    mark.appendChild(flower);
+  }
+
+  mark.setAttribute("aria-hidden", "true");
+  return mark;
 }
 
 function createPebble(color) {
@@ -115,12 +152,13 @@ function placePebble(row, col) {
   const cleared = clearGroups(color);
   if (cleared > 0) {
     const bonus = cleared >= 5 ? 40 : 0;
-    score += cleared * 20 + bonus;
-    setMessage(cleared >= 5 ? `Large group cleared. ${cleared} pebbles returned to the bowl.` : `Group cleared. ${cleared} pebbles returned to the bowl.`);
+    const flowerBonus = countFlowers() * 12;
+    score += cleared * 20 + bonus + flowerBonus;
+    setMessage(cleared >= 5 ? `Large group cleared. ${cleared} cells grew.` : `Group cleared. ${cleared} cells grew.`);
     pulseHaptic();
   } else {
     score += 2;
-    setMessage("Pebble placed. Build a touching group of three or more.");
+    setMessage("Pebble placed. Clear a group to grow sprouts and flowers.");
   }
 
   if (tray.length === 0) {
@@ -131,7 +169,7 @@ function placePebble(row, col) {
 
   if (isBoardFull()) {
     gameOver = true;
-    setMessage("Garden full. Start a new board and keep more space open.");
+    setMessage(`Garden full. You grew ${countFlowers()} flowers.`);
   }
 
   render();
@@ -151,6 +189,7 @@ function clearGroups(color) {
       if (group.length >= 3) {
         group.forEach(([groupRow, groupCol]) => {
           board[groupRow][groupCol] = null;
+          growth[groupRow][groupCol] = Math.min(2, growth[groupRow][groupCol] + 1);
         });
         totalCleared += group.length;
       }
@@ -201,6 +240,10 @@ function keyFor(row, col) {
 
 function isBoardFull() {
   return board.every((row) => row.every(Boolean));
+}
+
+function countFlowers() {
+  return growth.flat().filter((stage) => stage === 2).length;
 }
 
 function setMessage(text) {
