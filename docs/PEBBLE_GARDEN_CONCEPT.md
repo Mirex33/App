@@ -51,6 +51,7 @@ Tray:
 - Three pebbles at a time.
 - Pebbles have color only, no shape.
 - The selected pebble is highlighted.
+- Empty cells preview whether the selected pebble will clear, grow a bed, or bloom a bed.
 
 Clear:
 
@@ -72,6 +73,11 @@ Target:
 - The first test target is 4 flower beds before 14 moves run out.
 - A progress bar makes the session goal visible after every move.
 - Reaching the target ends the round in a win state.
+
+Feedback:
+
+- Stronger visual pulses fire when a bed sprouts or blooms.
+- Consecutive bed-growing moves build a small Flow streak.
 
 Failure:
 
