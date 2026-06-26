@@ -10,8 +10,8 @@ Signal Garden proved the route-and-space idea, but it may be too rule-heavy for 
 - One tap to select a pebble.
 - One tap to place it.
 - Three or more touching pebbles of the same color clear.
-- Cleared cells grow from soil into sprouts and then flowers.
-- The player grows as much of the garden as possible before the board fills.
+- Marked flower beds grow from seed bed into sprout and then flower.
+- The player blooms enough marked beds before the move limit or board pressure ends the round.
 
 This is simpler, more tactile, and closer to the original cozy "pebbles" direction.
 
@@ -23,7 +23,7 @@ Pebble Garden still maps to the strongest patterns found in the puzzle research:
 - **Competence:** every move has visible cause and effect.
 - **Near-miss tension:** the board gradually fills, and one placement can save space.
 - **Micro-reward:** clearing stones can use haptics, soft sound, and a satisfying pop.
-- **Visible progress:** each clear changes the garden, so the player sees a small world improve.
+- **Visible progress:** targeted clears change marked beds, so the player sees a small world improve.
 - **Short sessions:** a round can last 30-90 seconds.
 - **One-handed play:** the board and tray fit a thumb-first interaction model.
 
@@ -32,10 +32,10 @@ Pebble Garden still maps to the strongest patterns found in the puzzle research:
 1. The player receives three colored pebbles.
 2. The player places pebbles onto empty cells.
 3. Groups of three or more same-color pebbles connected orthogonally clear.
-4. Cleared cells grow: soil becomes sprout, sprout becomes flower.
+4. Cleared marked beds grow: seed bed becomes sprout, sprout becomes flower.
 5. Cleared pebbles score points and free space.
 6. A new tray appears after the three pebbles are used.
-7. The game ends when the board has no empty cells.
+7. The game ends when the flower target is reached, moves run out, or the board fills.
 
 ## MVP Rules
 
@@ -43,6 +43,7 @@ Board:
 
 - 6x6 grid.
 - A few starter pebbles create an obvious first clear.
+- Marked flower beds are the only cells that advance the goal.
 - Empty cells can accept any pebble.
 
 Tray:
@@ -55,27 +56,28 @@ Clear:
 
 - Three or more orthogonally connected pebbles of the same color clear.
 - Larger groups give a bonus.
-- Each cleared cell advances its garden stage.
+- Each cleared marked bed advances its garden stage.
 - Clearing creates a score popup, sound, and haptic feedback in the native app.
 
 Growth:
 
-- Empty cells start as soil.
-- First clear on a cell grows a sprout.
-- Second clear on the same cell grows a flower.
+- Marked beds start as seed beds.
+- First clear on a marked bed grows a sprout.
+- Second clear on the same marked bed grows a flower.
 - Flowers are a visible session goal and can give bonus points.
 - The prototype seeds one opening sprout so the first successful clear can bloom a flower.
 
 Target:
 
-- The first test target is 5 flowers before the board fills.
+- The first test target is 4 flower beds before 14 moves run out.
 - A progress bar makes the session goal visible after every move.
 - Reaching the target ends the round in a win state.
 
 Failure:
 
+- Moves run out before the target is reached.
 - The board fills with no empty cell.
-- Final result shows score and flowers grown.
+- Final result shows score and flower beds bloomed.
 
 ## Why It Is Better For Version 1
 
@@ -87,7 +89,7 @@ Compared with Signal Garden:
 - Easier to implement natively.
 - Easier to polish visually.
 - More suitable for a cozy tactile art direction.
-- Gives the player an emotional goal beyond score.
+- Gives the player an emotional goal and a tactical target beyond score.
 
 ## Risks
 
@@ -103,7 +105,7 @@ Use Pebble Garden as the first playable concept. The accepted first loop is:
 
 Current prototype variant:
 
-- compact target mode with a 5-flower goal.
+- compact target mode with 4 marked beds and 14 moves.
 
 Next, prototype two feel variants:
 
