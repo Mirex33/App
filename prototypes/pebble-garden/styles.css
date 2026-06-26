@@ -130,9 +130,9 @@ h1 {
 }
 
 .goal-copy {
-  display: flex;
+  display: grid;
   align-items: baseline;
-  justify-content: space-between;
+  grid-template-columns: auto 1fr auto;
   gap: 12px;
 }
 
@@ -145,6 +145,13 @@ h1 {
 
 .goal-copy strong {
   font-size: 0.94rem;
+}
+
+.goal-copy em {
+  color: var(--focus);
+  font-size: 0.82rem;
+  font-style: normal;
+  font-weight: 900;
 }
 
 .goal-meter {
@@ -213,6 +220,12 @@ h1 {
     var(--soil);
   cursor: default;
   overflow: hidden;
+}
+
+.cell.bed {
+  box-shadow:
+    inset 0 0 0 2px rgba(47, 138, 104, 0.34),
+    inset 0 0 18px rgba(47, 138, 104, 0.08);
 }
 
 .cell.growth-1 {
@@ -287,6 +300,16 @@ h1 {
   display: grid;
   place-items: center;
   pointer-events: none;
+}
+
+.seed-bed {
+  width: 48%;
+  height: 48%;
+  border: 2px dashed rgba(47, 138, 104, 0.62);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 56%, rgba(47, 138, 104, 0.28) 0 10%, transparent 12%),
+    rgba(255, 253, 248, 0.28);
 }
 
 .sprout {
@@ -442,7 +465,7 @@ h1 {
   }
 
   .goal-copy {
-    display: grid;
+    grid-template-columns: 1fr;
     gap: 3px;
   }
 
