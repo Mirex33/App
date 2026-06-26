@@ -13,7 +13,16 @@ const neighbors = [
   [1, 0],
   [0, -1],
 ];
-const targetFlowers = 5;
+const targetFlowers = 4;
+const moveLimit = 14;
+const flowerBedKeys = new Set(["1,2", "2,2", "2,3", "3,2", "3,3", "4,3"]);
+const traySchedule = [
+  ["red", "blue", "green"],
+  ["red", "red", "red"],
+  ["blue", "blue", "blue"],
+  ["green", "green", "green"],
+  ["yellow", "purple", "red"],
+];
 
 let board;
 let growth;
@@ -21,6 +30,8 @@ let tray;
 let selectedIndex = 0;
 let score = 0;
 let round = 1;
+let movesLeft = moveLimit;
+let trayIndex = 0;
 let gameOver = false;
 
 const boardEl = document.querySelector("#board");
@@ -30,6 +41,7 @@ const messageEl = document.querySelector("#message");
 const gardenLabelEl = document.querySelector("#garden-label");
 const goalLabelEl = document.querySelector("#goal-label");
 const goalFillEl = document.querySelector("#goal-fill");
+const moveLabelEl = document.querySelector("#move-label");
 const newGameButton = document.querySelector("#new-game");
 
 function newGame() {
@@ -37,19 +49,23 @@ function newGame() {
   growth = createBoard(0);
   score = 0;
   round = 1;
+  movesLeft = moveLimit;
+  trayIndex = 0;
   selectedIndex = 0;
   gameOver = false;
 
   board[2][2] = "red";
   board[2][3] = "red";
-  board[0][0] = "blue";
+  board[1][1] = "blue";
+  board[1][3] = "blue";
+  board[4][2] = "green";
   board[4][4] = "green";
   board[5][1] = "yellow";
   board[1][5] = "purple";
   growth[2][2] = 1;
 
-  tray = ["red", "blue", "green"];
-  setMessage("Place the red pebble next to the two red pebbles to bloom the sprout.");
+  tray = nextTray();
+  setMessage("Clear groups through marked beds before moves run out.");
   render();
 }
 
@@ -61,9 +77,10 @@ function render() {
   const flowers = countFlowers();
   const progress = Math.min(1, flowers / targetFlowers);
   scoreEl.textContent = score;
-  gardenLabelEl.textContent = `Flowers ${flowers}/${targetFlowers}`;
-  goalLabelEl.textContent = flowers >= targetFlowers ? "Goal Reached" : `Grow ${targetFlowers} flowers`;
+  gardenLabelEl.textContent = `Beds ${flowers}/${targetFlowers}`;
+  goalLabelEl.textContent = flowers >= targetFlowers ? "Goal Reached" : `Bloom ${targetFlowers} beds`;
   goalFillEl.style.width = `${Math.round(progress * 100)}%`;
+  moveLabelEl.textContent = movesLeft === 1 ? "1 move" : `${movesLeft} moves`;
   renderBoard();
   renderTray();
 }
@@ -76,11 +93,12 @@ function renderBoard() {
       const color = board[row][col];
       cell.type = "button";
       cell.className = color ? "cell filled" : "cell empty";
+      if (isFlowerBed(row, col)) cell.classList.add("bed");
       cell.disabled = gameOver || Boolean(color);
-      if (growth[row][col] > 0) cell.classList.add(`growth-${growth[row][col]}`);
+      if (isFlowerBed(row, col) && growth[row][col] > 0) cell.classList.add(`growth-${growth[row][col]}`);
       cell.setAttribute("aria-label", cellLabel(row, col, color));
 
-      if (growth[row][col] > 0) {
+      if (isFlowerBed(row, col)) {
         cell.appendChild(createGrowthMark(growth[row][col]));
       }
 
@@ -96,7 +114,8 @@ function renderBoard() {
 }
 
 function cellLabel(row, col, color) {
-  const stage = growth[row][col] === 2 ? "flower" : growth[row][col] === 1 ? "sprout" : "soil";
+  const isBed = isFlowerBed(row, col);
+  const stage = growth[row][col] === 2 ? "flower" : growth[row][col] === 1 ? "sprout" : isBed ? "seed bed" : "soil";
   if (color) return `${color} pebble on ${stage} row ${row + 1}, column ${col + 1}`;
   return `Empty ${stage} row ${row + 1}, column ${col + 1}`;
 }
@@ -123,7 +142,11 @@ function createGrowthMark(stage) {
   const mark = document.createElement("span");
   mark.className = "growth-mark";
 
-  if (stage === 1) {
+  if (stage === 0) {
+    const seed = document.createElement("span");
+    seed.className = "seed-bed";
+    mark.appendChild(seed);
+  } else if (stage === 1) {
     const sprout = document.createElement("span");
     sprout.className = "sprout";
     mark.appendChild(sprout);
@@ -155,19 +178,19 @@ function placePebble(row, col) {
 
   const color = tray[selectedIndex];
   board[row][col] = color;
+  movesLeft -= 1;
   tray.splice(selectedIndex, 1);
   if (selectedIndex >= tray.length) selectedIndex = Math.max(0, tray.length - 1);
 
-  const cleared = clearGroups(color);
-  if (cleared > 0) {
-    const bonus = cleared >= 5 ? 40 : 0;
-    const flowerBonus = countFlowers() * 12;
-    score += cleared * 20 + bonus + flowerBonus;
-    setMessage(cleared >= 5 ? `Large group cleared. ${cleared} cells grew.` : `Group cleared. ${cleared} cells grew.`);
+  const clearResult = clearGroups(color);
+  if (clearResult.cleared > 0) {
+    const bonus = clearResult.cleared >= 5 ? 40 : 0;
+    score += clearResult.cleared * 15 + clearResult.bedsGrown * 25 + clearResult.flowersGrown * 50 + bonus;
+    setClearMessage(clearResult);
     pulseHaptic();
   } else {
-    score += 2;
-    setMessage("Pebble placed. Clear a group to grow sprouts and flowers.");
+    score += 1;
+    setMessage("Pebble placed. No bed grew.");
   }
 
   if (tray.length === 0) {
@@ -179,10 +202,13 @@ function placePebble(row, col) {
   const flowersAfterMove = countFlowers();
   if (flowersAfterMove >= targetFlowers) {
     gameOver = true;
-    setMessage("Goal reached. You grew a full garden.");
+    setMessage("Goal reached. The garden bloomed.");
+  } else if (movesLeft <= 0) {
+    gameOver = true;
+    setMessage(`Out of moves. You bloomed ${flowersAfterMove} of ${targetFlowers} beds.`);
   } else if (isBoardFull()) {
     gameOver = true;
-    setMessage(`Garden full. You grew ${flowersAfterMove} of ${targetFlowers} flowers.`);
+    setMessage(`Garden full. You bloomed ${flowersAfterMove} of ${targetFlowers} beds.`);
   }
 
   render();
@@ -190,7 +216,11 @@ function placePebble(row, col) {
 
 function clearGroups(color) {
   const visited = new Set();
-  let totalCleared = 0;
+  const result = {
+    bedsGrown: 0,
+    cleared: 0,
+    flowersGrown: 0,
+  };
 
   for (let row = 0; row < size; row += 1) {
     for (let col = 0; col < size; col += 1) {
@@ -202,14 +232,19 @@ function clearGroups(color) {
       if (group.length >= 3) {
         group.forEach(([groupRow, groupCol]) => {
           board[groupRow][groupCol] = null;
-          growth[groupRow][groupCol] = Math.min(2, growth[groupRow][groupCol] + 1);
+          if (isFlowerBed(groupRow, groupCol)) {
+            const previousStage = growth[groupRow][groupCol];
+            growth[groupRow][groupCol] = Math.min(2, previousStage + 1);
+            if (growth[groupRow][groupCol] > previousStage) result.bedsGrown += 1;
+            if (growth[groupRow][groupCol] === 2 && previousStage < 2) result.flowersGrown += 1;
+          }
         });
-        totalCleared += group.length;
+        result.cleared += group.length;
       }
     }
   }
 
-  return totalCleared;
+  return result;
 }
 
 function collectGroup(startRow, startCol, color, visited) {
@@ -239,6 +274,12 @@ function collectGroup(startRow, startCol, color, visited) {
 }
 
 function nextTray() {
+  if (trayIndex < traySchedule.length) {
+    const scheduledTray = traySchedule[trayIndex];
+    trayIndex += 1;
+    return [...scheduledTray];
+  }
+
   const weights = round < 4 ? ["red", "blue", "green", "yellow"] : colors;
   return Array.from({ length: 3 }, () => weights[Math.floor(Math.random() * weights.length)]);
 }
@@ -251,12 +292,27 @@ function keyFor(row, col) {
   return `${row},${col}`;
 }
 
+function isFlowerBed(row, col) {
+  return flowerBedKeys.has(keyFor(row, col));
+}
+
 function isBoardFull() {
   return board.every((row) => row.every(Boolean));
 }
 
 function countFlowers() {
   return growth.flat().filter((stage) => stage === 2).length;
+}
+
+function setClearMessage({ bedsGrown, cleared, flowersGrown }) {
+  if (flowersGrown > 0) {
+    const remaining = Math.max(0, targetFlowers - countFlowers());
+    setMessage(remaining === 0 ? "Flower bed bloomed." : `Flower bed bloomed. ${remaining} to go.`);
+  } else if (bedsGrown > 0) {
+    setMessage("Bed sprouted. Clear it again to bloom.");
+  } else {
+    setMessage(`Group cleared. ${cleared} pebbles moved, but no bed grew.`);
+  }
 }
 
 function setMessage(text) {
