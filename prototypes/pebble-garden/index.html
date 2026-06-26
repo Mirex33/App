@@ -21,14 +21,15 @@
         </header>
 
         <section class="status-row" aria-live="polite">
-          <p id="message">Place the red pebble next to the two red pebbles to bloom the sprout.</p>
+          <p id="message">Clear groups through marked beds before moves run out.</p>
           <button id="new-game" class="text-button" type="button">New Board</button>
         </section>
 
         <section class="goal-panel" aria-label="Garden goal">
           <div class="goal-copy">
             <span>Garden Goal</span>
-            <strong id="goal-label">Grow 5 flowers</strong>
+            <strong id="goal-label">Bloom 4 beds</strong>
+            <em id="move-label">14 moves</em>
           </div>
           <div class="goal-meter" aria-hidden="true">
             <span id="goal-fill"></span>
@@ -42,15 +43,15 @@
         <section class="tray-area" aria-label="Pebble tray">
           <div class="tray-header">
             <span>Pebble Tray</span>
-            <span id="garden-label">Flowers 0/5</span>
+            <span id="garden-label">Beds 0/4</span>
           </div>
           <div id="tray" class="tray"></div>
         </section>
 
         <footer class="controls-note">
           <span>Select pebble</span>
-          <span>Place on soil</span>
-          <span>Grow flowers</span>
+          <span>Aim at beds</span>
+          <span>Bloom beds</span>
         </footer>
       </section>
     </main>
