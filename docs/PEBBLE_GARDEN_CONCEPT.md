@@ -66,6 +66,12 @@ Growth:
 - Flowers are a visible session goal and can give bonus points.
 - The prototype seeds one opening sprout so the first successful clear can bloom a flower.
 
+Target:
+
+- The first test target is 5 flowers before the board fills.
+- A progress bar makes the session goal visible after every move.
+- Reaching the target ends the round in a win state.
+
 Failure:
 
 - The board fills with no empty cell.
@@ -94,6 +100,10 @@ Compared with Signal Garden:
 Use Pebble Garden as the first playable concept. The accepted first loop is:
 
 > Clear pebbles to grow a small garden before the board fills up.
+
+Current prototype variant:
+
+- compact target mode with a 5-flower goal.
 
 Next, prototype two feel variants:
 
