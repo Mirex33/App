@@ -25,6 +25,16 @@
           <button id="new-game" class="text-button" type="button">New Board</button>
         </section>
 
+        <section class="goal-panel" aria-label="Garden goal">
+          <div class="goal-copy">
+            <span>Garden Goal</span>
+            <strong id="goal-label">Grow 5 flowers</strong>
+          </div>
+          <div class="goal-meter" aria-hidden="true">
+            <span id="goal-fill"></span>
+          </div>
+        </section>
+
         <section class="board-wrap">
           <div id="board" class="board" aria-label="Pebble Garden board"></div>
         </section>
@@ -32,7 +42,7 @@
         <section class="tray-area" aria-label="Pebble tray">
           <div class="tray-header">
             <span>Pebble Tray</span>
-            <span id="garden-label">Flowers 0</span>
+            <span id="garden-label">Flowers 0/5</span>
           </div>
           <div id="tray" class="tray"></div>
         </section>
