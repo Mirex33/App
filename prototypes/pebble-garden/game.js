@@ -13,6 +13,7 @@ const neighbors = [
   [1, 0],
   [0, -1],
 ];
+const targetFlowers = 5;
 
 let board;
 let growth;
@@ -27,6 +28,8 @@ const trayEl = document.querySelector("#tray");
 const scoreEl = document.querySelector("#score");
 const messageEl = document.querySelector("#message");
 const gardenLabelEl = document.querySelector("#garden-label");
+const goalLabelEl = document.querySelector("#goal-label");
+const goalFillEl = document.querySelector("#goal-fill");
 const newGameButton = document.querySelector("#new-game");
 
 function newGame() {
@@ -55,8 +58,12 @@ function createBoard(fill = null) {
 }
 
 function render() {
+  const flowers = countFlowers();
+  const progress = Math.min(1, flowers / targetFlowers);
   scoreEl.textContent = score;
-  gardenLabelEl.textContent = `Flowers ${countFlowers()}`;
+  gardenLabelEl.textContent = `Flowers ${flowers}/${targetFlowers}`;
+  goalLabelEl.textContent = flowers >= targetFlowers ? "Goal Reached" : `Grow ${targetFlowers} flowers`;
+  goalFillEl.style.width = `${Math.round(progress * 100)}%`;
   renderBoard();
   renderTray();
 }
@@ -69,6 +76,7 @@ function renderBoard() {
       const color = board[row][col];
       cell.type = "button";
       cell.className = color ? "cell filled" : "cell empty";
+      cell.disabled = gameOver || Boolean(color);
       if (growth[row][col] > 0) cell.classList.add(`growth-${growth[row][col]}`);
       cell.setAttribute("aria-label", cellLabel(row, col, color));
 
@@ -99,6 +107,7 @@ function renderTray() {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "pebble-card";
+    card.disabled = gameOver;
     if (index === selectedIndex) card.classList.add("selected");
     card.setAttribute("aria-label", `${color} pebble`);
     card.appendChild(createPebble(color));
@@ -167,9 +176,13 @@ function placePebble(row, col) {
     selectedIndex = 0;
   }
 
-  if (isBoardFull()) {
+  const flowersAfterMove = countFlowers();
+  if (flowersAfterMove >= targetFlowers) {
     gameOver = true;
-    setMessage(`Garden full. You grew ${countFlowers()} flowers.`);
+    setMessage("Goal reached. You grew a full garden.");
+  } else if (isBoardFull()) {
+    gameOver = true;
+    setMessage(`Garden full. You grew ${flowersAfterMove} of ${targetFlowers} flowers.`);
   }
 
   render();
