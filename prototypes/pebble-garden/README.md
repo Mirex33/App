@@ -16,6 +16,8 @@ Prototype goals:
 - Grade completed rounds with one to three garden marks based on moves remaining.
 - Show moves used, bed-clearing moves, best Flow, and a persistent personal best.
 - Give failed rounds a concrete near-miss message and an immediate retry.
+- Provide a compact pause sheet with persistent sound and haptic toggles.
+- Use lightweight generated audio cues for placement, clearing, growth, and blooming.
 - Show a calmer, more tactile direction than the route-based prototype.
 - Keep the rules simple enough for a first iPhone game.
 
