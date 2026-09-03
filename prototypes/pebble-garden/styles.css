@@ -150,6 +150,59 @@ h1 {
   line-height: 1.35;
 }
 
+.level-switcher {
+  display: grid;
+  grid-template-columns: 36px auto 36px;
+  min-height: 42px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fffdf8;
+  overflow: hidden;
+}
+
+.level-switcher strong {
+  min-width: 42px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.level-button {
+  position: relative;
+  align-self: stretch;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.level-button:hover:not(:disabled) {
+  background: rgba(47, 138, 104, 0.08);
+}
+
+.level-button:disabled {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.chevron {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+}
+
+.chevron-left {
+  transform: translate(-35%, -50%) rotate(45deg);
+}
+
+.chevron-right {
+  transform: translate(-65%, -50%) rotate(225deg);
+}
+
 .text-button {
   min-height: 42px;
   padding: 0 14px;
@@ -399,14 +452,36 @@ h1 {
   z-index: 1;
   width: 72%;
   height: 72%;
-  border: 1px solid rgba(54, 42, 24, 0.18);
+  border: 0;
   border-radius: 49% 51% 47% 53% / 53% 45% 55% 47%;
-  background:
-    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.55), transparent 26%),
-    var(--pebble-color);
+  background-color: var(--pebble-color);
+  background-image: var(--pebble-art);
+  background-blend-mode: multiply;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 180%;
   box-shadow:
-    inset -8px -10px 16px rgba(52, 40, 22, 0.14),
     0 7px 12px rgba(62, 47, 29, 0.16);
+}
+
+.pebble-red {
+  --pebble-art: url("../../design/assets/game/pebble-red.png");
+}
+
+.pebble-blue {
+  --pebble-art: url("../../design/assets/game/pebble-blue.png");
+}
+
+.pebble-green {
+  --pebble-art: url("../../design/assets/game/pebble-green.png");
+}
+
+.pebble-yellow {
+  --pebble-art: url("../../design/assets/game/pebble-yellow.png");
+}
+
+.pebble-purple {
+  --pebble-art: url("../../design/assets/game/pebble-purple.png");
 }
 
 .growth-mark {
@@ -429,21 +504,15 @@ h1 {
 }
 
 .sprout {
-  position: relative;
-  width: 34%;
-  height: 44%;
+  width: 48%;
+  height: 52%;
+  background: url("../../design/assets/game/sprout.png") center / 165% no-repeat;
+  clip-path: polygon(0 12%, 40% 20%, 50% 38%, 60% 20%, 100% 12%, 88% 58%, 62% 58%, 60% 100%, 40% 100%, 38% 58%, 12% 58%);
 }
 
 .sprout::before,
 .sprout::after {
-  content: "";
-  position: absolute;
-  bottom: 24%;
-  width: 58%;
-  height: 44%;
-  border-radius: 100% 0 100% 0;
-  background: #5eaa70;
-  box-shadow: inset -3px -4px 8px rgba(31, 85, 49, 0.18);
+  display: none;
 }
 
 .sprout::before {
@@ -457,30 +526,19 @@ h1 {
 }
 
 .flower {
-  position: relative;
-  width: 48%;
-  height: 48%;
+  width: 58%;
+  height: 58%;
+  border-radius: 50%;
+  background: url("../../design/assets/game/flower.png") center / 180% no-repeat;
+  box-shadow: 0 4px 9px rgba(107, 82, 31, 0.14);
 }
 
 .flower::before {
-  content: "";
-  position: absolute;
-  inset: 28%;
-  z-index: 2;
-  border-radius: 50%;
-  background: #d5a743;
+  display: none;
 }
 
 .petal {
-  position: absolute;
-  left: 37%;
-  top: 4%;
-  width: 26%;
-  height: 40%;
-  border-radius: 50% 50% 42% 42%;
-  background: #fff1a8;
-  transform-origin: 50% 112%;
-  box-shadow: inset -3px -4px 7px rgba(169, 126, 34, 0.16);
+  display: none;
 }
 
 .petal:nth-child(1) {

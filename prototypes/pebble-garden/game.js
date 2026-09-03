@@ -13,27 +13,97 @@ const neighbors = [
   [1, 0],
   [0, -1],
 ];
-const targetFlowers = 4;
-const moveLimit = 14;
+const baseLayout = {
+  beds: [[1, 2], [2, 2], [2, 3], [3, 2], [3, 3], [4, 3]],
+  growth: [[2, 2, 1]],
+  pebbles: [
+    [2, 2, "red"],
+    [2, 3, "red"],
+    [1, 1, "blue"],
+    [1, 3, "blue"],
+    [4, 2, "green"],
+    [4, 4, "green"],
+    [5, 1, "yellow"],
+    [1, 5, "purple"],
+  ],
+  solution: [[2, 1], [1, 2], [4, 3], [2, 2], [2, 3], [2, 4], [1, 1], [1, 2], [1, 3], [4, 2], [4, 3], [4, 4]],
+  trays: [
+    ["red", "blue", "green"],
+    ["red", "red", "red"],
+    ["blue", "blue", "blue"],
+    ["green", "green", "green"],
+    ["yellow", "purple", "red"],
+  ],
+};
+const levels = [
+  createLevel({
+    id: "first-bloom",
+    name: "First Bloom",
+    transform: "identity",
+    targetFlowers: 2,
+    moveLimit: 8,
+    parMoves: 6,
+    hint: "Bloom two marked beds before eight moves run out.",
+  }),
+  createLevel({
+    id: "garden-turn",
+    name: "Garden Turn",
+    transform: "rotate-right",
+    colorMap: { red: "blue", blue: "green", green: "red", yellow: "purple", purple: "yellow" },
+    targetFlowers: 3,
+    moveLimit: 11,
+    parMoves: 9,
+    hint: "Read the turned garden and keep useful clears together.",
+  }),
+  createLevel({
+    id: "split-beds",
+    name: "Split Beds",
+    transform: "mirror",
+    colorMap: { red: "green", blue: "red", green: "blue", yellow: "yellow", purple: "purple" },
+    targetFlowers: 4,
+    moveLimit: 14,
+    parMoves: 12,
+    hint: "Plan both sides of the garden before the tray changes.",
+  }),
+  createLevel({
+    id: "tight-spiral",
+    name: "Tight Spiral",
+    transform: "rotate-180",
+    colorMap: { red: "purple", blue: "yellow", green: "red", yellow: "green", purple: "blue" },
+    targetFlowers: 4,
+    moveLimit: 13,
+    parMoves: 12,
+    hint: "Only one spare move remains. Grow beds with every clear.",
+  }),
+  createLevel({
+    id: "five-colors",
+    name: "Five Colors",
+    transform: "rotate-left",
+    targetFlowers: 5,
+    moveLimit: 15,
+    parMoves: 13,
+    hint: "The yellow bed is ready. Save its final stone for the finish.",
+    extraBeds: [[1, 4]],
+    extraGrowth: [[1, 4, 1]],
+    extraPebbles: [[0, 4, "yellow"], [1, 4, "yellow"]],
+    extraSolution: [[2, 4]],
+  }),
+];
 const bestMovesStorageKey = "pebble-garden-best-moves";
+const levelStorageKey = "pebble-garden-level";
 const soundStorageKey = "pebble-garden-sound";
 const hapticsStorageKey = "pebble-garden-haptics";
-const flowerBedKeys = new Set(["1,2", "2,2", "2,3", "3,2", "3,3", "4,3"]);
-const traySchedule = [
-  ["red", "blue", "green"],
-  ["red", "red", "red"],
-  ["blue", "blue", "blue"],
-  ["green", "green", "green"],
-  ["yellow", "purple", "red"],
-];
 
 let board;
 let growth;
 let tray;
+let flowerBedKeys;
+let currentLevel;
+let levelIndex = Math.min(levels.length - 1, Math.max(0, readNumberSetting(levelStorageKey, 0)));
 let selectedIndex = 0;
 let score = 0;
 let round = 1;
-let movesLeft = moveLimit;
+let movesLeft = 0;
 let trayIndex = 0;
 let streak = 0;
 let bestFlow = 0;
@@ -42,6 +112,7 @@ let movesUsed = 0;
 let lastBloomKeys;
 let lastGrowthKeys;
 let gameOver = false;
+let roundWon = false;
 let audioContext;
 let soundEnabled = readBooleanSetting(soundStorageKey, true);
 let hapticsEnabled = readBooleanSetting(hapticsStorageKey, true);
@@ -55,7 +126,10 @@ const goalLabelEl = document.querySelector("#goal-label");
 const goalFillEl = document.querySelector("#goal-fill");
 const flowLabelEl = document.querySelector("#flow-label");
 const moveLabelEl = document.querySelector("#move-label");
-const newGameButton = document.querySelector("#new-game");
+const levelNameEl = document.querySelector("#level-name");
+const levelProgressEl = document.querySelector("#level-progress");
+const previousLevelButton = document.querySelector("#previous-level");
+const nextLevelButton = document.querySelector("#next-level");
 const resultBackdropEl = document.querySelector("#result-backdrop");
 const resultKickerEl = document.querySelector("#result-kicker");
 const resultTitleEl = document.querySelector("#result-title");
@@ -73,12 +147,40 @@ const hapticsToggleEl = document.querySelector("#haptics-toggle");
 const resumeGameButton = document.querySelector("#resume-game");
 const restartGameButton = document.querySelector("#restart-game");
 
+function createLevel(options) {
+  const colorMap = options.colorMap || {};
+  const transform = ([row, col]) => transformCell(row, col, options.transform);
+  const beds = [...baseLayout.beds, ...(options.extraBeds || [])].map(transform);
+  const growthEntries = [...baseLayout.growth, ...(options.extraGrowth || [])];
+  const pebbleEntries = [...baseLayout.pebbles, ...(options.extraPebbles || [])];
+  const solutionEntries = [...baseLayout.solution, ...(options.extraSolution || [])];
+
+  return {
+    ...options,
+    beds,
+    growth: growthEntries.map(([row, col, stage]) => [...transform([row, col]), stage]),
+    pebbles: pebbleEntries.map(([row, col, color]) => [...transform([row, col]), colorMap[color] || color]),
+    solution: solutionEntries.map(transform),
+    trays: baseLayout.trays.map((trayColors) => trayColors.map((color) => colorMap[color] || color)),
+  };
+}
+
+function transformCell(row, col, transform) {
+  if (transform === "rotate-right") return [col, size - 1 - row];
+  if (transform === "rotate-left") return [size - 1 - col, row];
+  if (transform === "rotate-180") return [size - 1 - row, size - 1 - col];
+  if (transform === "mirror") return [row, size - 1 - col];
+  return [row, col];
+}
+
 function newGame() {
+  currentLevel = levels[levelIndex];
   board = createBoard();
   growth = createBoard(0);
+  flowerBedKeys = new Set(currentLevel.beds.map(([row, col]) => keyFor(row, col)));
   score = 0;
   round = 1;
-  movesLeft = moveLimit;
+  movesLeft = currentLevel.moveLimit;
   trayIndex = 0;
   streak = 0;
   bestFlow = 0;
@@ -88,21 +190,19 @@ function newGame() {
   lastGrowthKeys = new Set();
   selectedIndex = 0;
   gameOver = false;
+  roundWon = false;
   resultBackdropEl.hidden = true;
   settingsBackdropEl.hidden = true;
 
-  board[2][2] = "red";
-  board[2][3] = "red";
-  board[1][1] = "blue";
-  board[1][3] = "blue";
-  board[4][2] = "green";
-  board[4][4] = "green";
-  board[5][1] = "yellow";
-  board[1][5] = "purple";
-  growth[2][2] = 1;
+  currentLevel.pebbles.forEach(([row, col, color]) => {
+    board[row][col] = color;
+  });
+  currentLevel.growth.forEach(([row, col, stage]) => {
+    growth[row][col] = stage;
+  });
 
   tray = nextTray();
-  setMessage("Clear groups through marked beds before moves run out.");
+  setMessage(currentLevel.hint);
   render();
 }
 
@@ -112,10 +212,14 @@ function createBoard(fill = null) {
 
 function render() {
   const flowers = countFlowers();
-  const progress = Math.min(1, flowers / targetFlowers);
+  const progress = Math.min(1, flowers / currentLevel.targetFlowers);
   scoreEl.textContent = score;
-  gardenLabelEl.textContent = `Beds ${flowers}/${targetFlowers}`;
-  goalLabelEl.textContent = flowers >= targetFlowers ? "Goal Reached" : `Bloom ${targetFlowers} beds`;
+  levelNameEl.textContent = `Level ${levelIndex + 1} - ${currentLevel.name}`;
+  levelProgressEl.textContent = `${levelIndex + 1} / ${levels.length}`;
+  previousLevelButton.disabled = levelIndex === 0;
+  nextLevelButton.disabled = levelIndex === levels.length - 1;
+  gardenLabelEl.textContent = `Beds ${flowers}/${currentLevel.targetFlowers}`;
+  goalLabelEl.textContent = flowers >= currentLevel.targetFlowers ? "Goal Reached" : `Bloom ${currentLevel.targetFlowers} beds`;
   goalFillEl.style.width = `${Math.round(progress * 100)}%`;
   flowLabelEl.textContent = `Flow x${Math.max(1, streak)}`;
   moveLabelEl.textContent = movesLeft === 1 ? "1 move" : `${movesLeft} moves`;
@@ -216,7 +320,7 @@ function createGrowthMark(stage) {
 
 function createPebble(color) {
   const pebble = document.createElement("span");
-  pebble.className = "pebble";
+  pebble.className = `pebble pebble-${color}`;
   pebble.style.setProperty("--pebble-color", colorVars[color]);
   pebble.setAttribute("aria-hidden", "true");
   return pebble;
@@ -264,14 +368,14 @@ function placePebble(row, col) {
   }
 
   const flowersAfterMove = countFlowers();
-  if (flowersAfterMove >= targetFlowers) {
+  if (flowersAfterMove >= currentLevel.targetFlowers) {
     setMessage("Goal reached. The garden bloomed.");
     finishGame(true, flowersAfterMove);
   } else if (movesLeft <= 0) {
-    setMessage(`Out of moves. You bloomed ${flowersAfterMove} of ${targetFlowers} beds.`);
+    setMessage(`Out of moves. You bloomed ${flowersAfterMove} of ${currentLevel.targetFlowers} beds.`);
     finishGame(false, flowersAfterMove);
   } else if (isBoardFull()) {
-    setMessage(`Garden full. You bloomed ${flowersAfterMove} of ${targetFlowers} beds.`);
+    setMessage(`Garden full. You bloomed ${flowersAfterMove} of ${currentLevel.targetFlowers} beds.`);
     finishGame(false, flowersAfterMove);
   }
 
@@ -390,8 +494,8 @@ function collectPotentialGroup(startRow, startCol, color) {
 }
 
 function nextTray() {
-  if (trayIndex < traySchedule.length) {
-    const scheduledTray = traySchedule[trayIndex];
+  if (trayIndex < currentLevel.trays.length) {
+    const scheduledTray = currentLevel.trays[trayIndex];
     trayIndex += 1;
     return [...scheduledTray];
   }
@@ -422,11 +526,13 @@ function countFlowers() {
 
 function finishGame(won, flowers) {
   gameOver = true;
-  const previousBest = readBestMoves();
+  roundWon = won;
+  const bestKey = `${bestMovesStorageKey}-${currentLevel.id}`;
+  const previousBest = readBestMoves(bestKey);
   const isNewBest = won && (previousBest === null || movesUsed < previousBest);
   const bestMoves = isNewBest ? movesUsed : previousBest;
 
-  if (isNewBest) writeBestMoves(movesUsed);
+  if (isNewBest) writeBestMoves(bestKey, movesUsed);
 
   const result = getRoundResult(won, flowers);
   resultKickerEl.textContent = won ? "Round Complete" : "Round Over";
@@ -439,7 +545,8 @@ function finishGame(won, flowers) {
     ? `New personal best: ${movesUsed} moves`
     : bestMoves === null
       ? "Your first win will set a personal best."
-      : `Personal best: ${bestMoves} moves`;
+      : `Level best: ${bestMoves} moves`;
+  playAgainButton.textContent = won && levelIndex < levels.length - 1 ? "Next Level" : "Play Again";
   renderRating(result.rating);
   resultBackdropEl.hidden = false;
   playAgainButton.focus();
@@ -447,9 +554,9 @@ function finishGame(won, flowers) {
 
 function getRoundResult(won, flowers) {
   if (!won) {
-    const remaining = targetFlowers - flowers;
+    const remaining = currentLevel.targetFlowers - flowers;
     return {
-      title: flowers >= targetFlowers - 1 ? "Almost Blooming" : "Garden Resting",
+      title: flowers >= currentLevel.targetFlowers - 1 ? "Almost Blooming" : "Garden Resting",
       copy: remaining === 1
         ? "One more flower would have saved the garden. Build Flow through the marked beds."
         : `${remaining} more flowers were needed. Use the previews to connect clears through marked beds.`,
@@ -457,15 +564,15 @@ function getRoundResult(won, flowers) {
     };
   }
 
-  if (movesLeft >= 2) {
+  if (movesUsed <= currentLevel.parMoves) {
     return {
       title: "Perfect Bloom",
-      copy: `You saved the garden with ${movesLeft} moves to spare. Now try to beat your route.`,
+      copy: `You matched the garden target in ${movesUsed} moves. Try to beat this route next time.`,
       rating: 3,
     };
   }
 
-  if (movesLeft === 1) {
+  if (movesUsed <= currentLevel.parMoves + 1) {
     return {
       title: "Garden Saved",
       copy: "A careful finish with one move to spare. A cleaner Flow can earn the final mark.",
@@ -486,9 +593,9 @@ function renderRating(rating) {
   resultRatingEl.setAttribute("aria-label", `${rating} out of 3 garden marks`);
 }
 
-function readBestMoves() {
+function readBestMoves(key) {
   try {
-    const storedValue = window.localStorage.getItem(bestMovesStorageKey);
+    const storedValue = window.localStorage.getItem(key);
     if (storedValue === null) return null;
     const parsedValue = Number.parseInt(storedValue, 10);
     return Number.isFinite(parsedValue) ? parsedValue : null;
@@ -497,11 +604,46 @@ function readBestMoves() {
   }
 }
 
-function writeBestMoves(value) {
+function writeBestMoves(key, value) {
   try {
-    window.localStorage.setItem(bestMovesStorageKey, String(value));
+    window.localStorage.setItem(key, String(value));
   } catch {
     // The prototype still works when browser storage is unavailable.
+  }
+}
+
+function readNumberSetting(key, fallback) {
+  try {
+    const storedValue = window.localStorage.getItem(key);
+    if (storedValue === null) return fallback;
+    const parsedValue = Number.parseInt(storedValue, 10);
+    return Number.isFinite(parsedValue) ? parsedValue : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function changeLevel(offset) {
+  const nextIndex = Math.min(levels.length - 1, Math.max(0, levelIndex + offset));
+  if (nextIndex === levelIndex) return;
+  levelIndex = nextIndex;
+  writeNumberSetting(levelStorageKey, levelIndex);
+  newGame();
+}
+
+function writeNumberSetting(key, value) {
+  try {
+    window.localStorage.setItem(key, String(value));
+  } catch {
+    // Level choice remains available for the current session.
+  }
+}
+
+function continueAfterRound() {
+  if (roundWon && levelIndex < levels.length - 1) {
+    changeLevel(1);
+  } else {
+    newGame();
   }
 }
 
@@ -567,7 +709,7 @@ function playGameSound(kind) {
 function setClearMessage({ bedsGrown, cleared, flowersGrown }, flow) {
   const flowText = flow > 1 ? ` Flow x${flow}.` : "";
   if (flowersGrown > 0) {
-    const remaining = Math.max(0, targetFlowers - countFlowers());
+    const remaining = Math.max(0, currentLevel.targetFlowers - countFlowers());
     setMessage(remaining === 0 ? `Flower bed bloomed.${flowText}` : `Flower bed bloomed.${flowText} ${remaining} to go.`);
   } else if (bedsGrown > 0) {
     setMessage(`Bed sprouted.${flowText} Clear it again to bloom.`);
@@ -586,8 +728,9 @@ function pulseHaptic() {
   }
 }
 
-newGameButton.addEventListener("click", newGame);
-playAgainButton.addEventListener("click", newGame);
+previousLevelButton.addEventListener("click", () => changeLevel(-1));
+nextLevelButton.addEventListener("click", () => changeLevel(1));
+playAgainButton.addEventListener("click", continueAfterRound);
 menuButton.addEventListener("click", openSettings);
 resumeGameButton.addEventListener("click", closeSettings);
 restartGameButton.addEventListener("click", newGame);

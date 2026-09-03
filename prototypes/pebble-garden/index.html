@@ -11,7 +11,7 @@
       <section class="game-surface">
         <header class="top-bar">
           <div>
-            <p class="eyebrow">Mechanics Prototype</p>
+            <p id="level-name" class="eyebrow">Level 1 - First Bloom</p>
             <h1>Pebble Garden</h1>
           </div>
           <div class="top-actions">
@@ -26,16 +26,24 @@
         </header>
 
         <section class="status-row" aria-live="polite">
-          <p id="message">Clear groups through marked beds before moves run out.</p>
-          <button id="new-game" class="text-button" type="button">New Board</button>
+          <p id="message">Bloom two marked beds before eight moves run out.</p>
+          <nav class="level-switcher" aria-label="Level selection">
+            <button id="previous-level" class="level-button" type="button" aria-label="Previous level" title="Previous level">
+              <span class="chevron chevron-left" aria-hidden="true"></span>
+            </button>
+            <strong id="level-progress">1 / 5</strong>
+            <button id="next-level" class="level-button" type="button" aria-label="Next level" title="Next level">
+              <span class="chevron chevron-right" aria-hidden="true"></span>
+            </button>
+          </nav>
         </section>
 
         <section class="goal-panel" aria-label="Garden goal">
           <div class="goal-copy">
             <span>Garden Goal</span>
-            <strong id="goal-label">Bloom 4 beds</strong>
+            <strong id="goal-label">Bloom 2 beds</strong>
             <em id="flow-label">Flow x1</em>
-            <em id="move-label">14 moves</em>
+            <em id="move-label">8 moves</em>
           </div>
           <div class="goal-meter" aria-hidden="true">
             <span id="goal-fill"></span>
@@ -49,7 +57,7 @@
         <section class="tray-area" aria-label="Pebble tray">
           <div class="tray-header">
             <span>Pebble Tray</span>
-            <span id="garden-label">Beds 0/4</span>
+            <span id="garden-label">Beds 0/2</span>
           </div>
           <div id="tray" class="tray"></div>
         </section>

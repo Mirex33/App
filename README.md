@@ -9,3 +9,5 @@ Playable mechanics prototype: [prototypes/signal-garden/index.html](prototypes/s
 Simpler stone prototype: [prototypes/pebble-garden/index.html](prototypes/pebble-garden/index.html)
 
 Selected visual system: [docs/DESIGN_DIRECTION.md](docs/DESIGN_DIRECTION.md)
+
+Level progression and generated gameplay art: [docs/LEVELS_AND_ART.md](docs/LEVELS_AND_ART.md)

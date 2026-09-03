@@ -18,7 +18,16 @@ Prototype goals:
 - Give failed rounds a concrete near-miss message and an immediate retry.
 - Provide a compact pause sheet with persistent sound and haptic toggles.
 - Use lightweight generated audio cues for placement, clearing, growth, and blooming.
+- Include five deterministic levels with verified target routes and increasing move pressure.
+- Store a separate personal best for every level and advance after a win.
+- Render generated pebble, sprout, and flower art inside compact gameplay masks.
 - Show a calmer, more tactile direction than the route-based prototype.
 - Keep the rules simple enough for a first iPhone game.
 
 This is not the final visual design or production code.
+
+Run the deterministic level check with:
+
+```sh
+node prototypes/pebble-garden/game.test.js
+```
