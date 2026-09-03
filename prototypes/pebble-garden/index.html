@@ -54,6 +54,35 @@
           <span>Aim at beds</span>
           <span>Bloom beds</span>
         </footer>
+
+        <div id="result-backdrop" class="result-backdrop" hidden>
+          <section class="result-panel" role="dialog" aria-modal="true" aria-labelledby="result-title">
+            <p id="result-kicker" class="result-kicker">Round Complete</p>
+            <h2 id="result-title">Garden Saved</h2>
+            <div id="result-rating" class="result-rating" aria-label="One out of three garden marks">
+              <span class="result-mark"></span>
+              <span class="result-mark"></span>
+              <span class="result-mark"></span>
+            </div>
+            <p id="result-copy" class="result-copy"></p>
+            <dl class="result-stats">
+              <div>
+                <dt>Moves</dt>
+                <dd id="result-moves">0</dd>
+              </div>
+              <div>
+                <dt>Bed Clears</dt>
+                <dd id="result-growth">0</dd>
+              </div>
+              <div>
+                <dt>Best Flow</dt>
+                <dd id="result-flow">x1</dd>
+              </div>
+            </dl>
+            <p id="result-best" class="result-best"></p>
+            <button id="play-again" class="primary-button" type="button">Play Again</button>
+          </section>
+        </div>
       </section>
     </main>
 
