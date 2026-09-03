@@ -214,12 +214,19 @@ Cannot fully automate without the Mac owner's participation:
 
 ## Decisions Still Needed
 
-1. Which puzzle type should the MVP use: route connection, block placement, board clearing, pattern finding, or a mixed mechanic?
-2. Which visual direction should come first: minimal, cozy, neon, or bright casual?
-3. Should version 1 use endless score mode or levels?
-4. Is an Apple Developer Account already available?
-5. Will the first tests use a real iPhone, Simulator only, or both?
+Decided:
+
+- The MVP concept is Pebble Garden, a compact board-clearing puzzle with marked flower beds.
+- The first visual direction is cozy and tactile.
+- The first playable mode uses a fixed flower target and move limit.
+- The browser prototype includes win and loss states, immediate retry, round grading, and a local personal best.
+
+Still needed:
+
+1. Confirm whether an Apple Developer Account is already available.
+2. Decide whether the first device tests use a real iPhone, Simulator only, or both.
+3. Test whether new players understand marked beds and choose to retry after a near miss.
 
 ## Next Step
 
-Use the `codex/concept-research` branch to prepare 3-5 game concepts and score them by implementation simplicity, originality, retention potential, and App Store risk.
+Complete the cozy tactile design direction and main-screen flow while Xcode is unavailable. After Xcode and an iOS Simulator runtime are installed, create the native SwiftUI project and port the verified Pebble Garden rules.
