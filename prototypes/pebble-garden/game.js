@@ -15,6 +15,7 @@ const neighbors = [
 ];
 const targetFlowers = 4;
 const moveLimit = 14;
+const bestMovesStorageKey = "pebble-garden-best-moves";
 const flowerBedKeys = new Set(["1,2", "2,2", "2,3", "3,2", "3,3", "4,3"]);
 const traySchedule = [
   ["red", "blue", "green"],
@@ -33,6 +34,9 @@ let round = 1;
 let movesLeft = moveLimit;
 let trayIndex = 0;
 let streak = 0;
+let bestFlow = 0;
+let bedClearMoves = 0;
+let movesUsed = 0;
 let lastBloomKeys;
 let lastGrowthKeys;
 let gameOver = false;
@@ -47,6 +51,16 @@ const goalFillEl = document.querySelector("#goal-fill");
 const flowLabelEl = document.querySelector("#flow-label");
 const moveLabelEl = document.querySelector("#move-label");
 const newGameButton = document.querySelector("#new-game");
+const resultBackdropEl = document.querySelector("#result-backdrop");
+const resultKickerEl = document.querySelector("#result-kicker");
+const resultTitleEl = document.querySelector("#result-title");
+const resultRatingEl = document.querySelector("#result-rating");
+const resultCopyEl = document.querySelector("#result-copy");
+const resultMovesEl = document.querySelector("#result-moves");
+const resultGrowthEl = document.querySelector("#result-growth");
+const resultFlowEl = document.querySelector("#result-flow");
+const resultBestEl = document.querySelector("#result-best");
+const playAgainButton = document.querySelector("#play-again");
 
 function newGame() {
   board = createBoard();
@@ -56,10 +70,14 @@ function newGame() {
   movesLeft = moveLimit;
   trayIndex = 0;
   streak = 0;
+  bestFlow = 0;
+  bedClearMoves = 0;
+  movesUsed = 0;
   lastBloomKeys = new Set();
   lastGrowthKeys = new Set();
   selectedIndex = 0;
   gameOver = false;
+  resultBackdropEl.hidden = true;
 
   board[2][2] = "red";
   board[2][3] = "red";
@@ -198,6 +216,7 @@ function placePebble(row, col) {
   const color = tray[selectedIndex];
   board[row][col] = color;
   movesLeft -= 1;
+  movesUsed += 1;
   lastBloomKeys = new Set();
   lastGrowthKeys = new Set();
   tray.splice(selectedIndex, 1);
@@ -208,9 +227,11 @@ function placePebble(row, col) {
     const bonus = clearResult.cleared >= 5 ? 40 : 0;
     if (clearResult.bedsGrown > 0) {
       streak = Math.min(3, streak + 1);
+      bedClearMoves += 1;
     } else {
       streak = 0;
     }
+    bestFlow = Math.max(bestFlow, streak);
     lastBloomKeys = new Set(clearResult.bloomKeys);
     lastGrowthKeys = new Set(clearResult.growthKeys);
     score += clearResult.cleared * 15 + clearResult.bedsGrown * 25 + clearResult.flowersGrown * 50 + bonus + streak * 12;
@@ -230,14 +251,14 @@ function placePebble(row, col) {
 
   const flowersAfterMove = countFlowers();
   if (flowersAfterMove >= targetFlowers) {
-    gameOver = true;
     setMessage("Goal reached. The garden bloomed.");
+    finishGame(true, flowersAfterMove);
   } else if (movesLeft <= 0) {
-    gameOver = true;
     setMessage(`Out of moves. You bloomed ${flowersAfterMove} of ${targetFlowers} beds.`);
+    finishGame(false, flowersAfterMove);
   } else if (isBoardFull()) {
-    gameOver = true;
     setMessage(`Garden full. You bloomed ${flowersAfterMove} of ${targetFlowers} beds.`);
+    finishGame(false, flowersAfterMove);
   }
 
   render();
@@ -385,6 +406,91 @@ function countFlowers() {
   return growth.flat().filter((stage) => stage === 2).length;
 }
 
+function finishGame(won, flowers) {
+  gameOver = true;
+  const previousBest = readBestMoves();
+  const isNewBest = won && (previousBest === null || movesUsed < previousBest);
+  const bestMoves = isNewBest ? movesUsed : previousBest;
+
+  if (isNewBest) writeBestMoves(movesUsed);
+
+  const result = getRoundResult(won, flowers);
+  resultKickerEl.textContent = won ? "Round Complete" : "Round Over";
+  resultTitleEl.textContent = result.title;
+  resultCopyEl.textContent = result.copy;
+  resultMovesEl.textContent = movesUsed;
+  resultGrowthEl.textContent = bedClearMoves;
+  resultFlowEl.textContent = `x${Math.max(1, bestFlow)}`;
+  resultBestEl.textContent = isNewBest
+    ? `New personal best: ${movesUsed} moves`
+    : bestMoves === null
+      ? "Your first win will set a personal best."
+      : `Personal best: ${bestMoves} moves`;
+  renderRating(result.rating);
+  resultBackdropEl.hidden = false;
+  playAgainButton.focus();
+}
+
+function getRoundResult(won, flowers) {
+  if (!won) {
+    const remaining = targetFlowers - flowers;
+    return {
+      title: flowers >= targetFlowers - 1 ? "Almost Blooming" : "Garden Resting",
+      copy: remaining === 1
+        ? "One more flower would have saved the garden. Build Flow through the marked beds."
+        : `${remaining} more flowers were needed. Use the previews to connect clears through marked beds.`,
+      rating: 0,
+    };
+  }
+
+  if (movesLeft >= 2) {
+    return {
+      title: "Perfect Bloom",
+      copy: `You saved the garden with ${movesLeft} moves to spare. Now try to beat your route.`,
+      rating: 3,
+    };
+  }
+
+  if (movesLeft === 1) {
+    return {
+      title: "Garden Saved",
+      copy: "A careful finish with one move to spare. A cleaner Flow can earn the final mark.",
+      rating: 2,
+    };
+  }
+
+  return {
+    title: "Last-Move Bloom",
+    copy: "You saved the garden on the final move. Every placement counted.",
+    rating: 1,
+  };
+}
+
+function renderRating(rating) {
+  const marks = resultRatingEl.querySelectorAll(".result-mark");
+  marks.forEach((mark, index) => mark.classList.toggle("earned", index < rating));
+  resultRatingEl.setAttribute("aria-label", `${rating} out of 3 garden marks`);
+}
+
+function readBestMoves() {
+  try {
+    const storedValue = window.localStorage.getItem(bestMovesStorageKey);
+    if (storedValue === null) return null;
+    const parsedValue = Number.parseInt(storedValue, 10);
+    return Number.isFinite(parsedValue) ? parsedValue : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeBestMoves(value) {
+  try {
+    window.localStorage.setItem(bestMovesStorageKey, String(value));
+  } catch {
+    // The prototype still works when browser storage is unavailable.
+  }
+}
+
 function setClearMessage({ bedsGrown, cleared, flowersGrown }, flow) {
   const flowText = flow > 1 ? ` Flow x${flow}.` : "";
   if (flowersGrown > 0) {
@@ -408,4 +514,5 @@ function pulseHaptic() {
 }
 
 newGameButton.addEventListener("click", newGame);
+playAgainButton.addEventListener("click", newGame);
 newGame();
