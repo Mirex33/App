@@ -16,6 +16,8 @@ const neighbors = [
 const targetFlowers = 4;
 const moveLimit = 14;
 const bestMovesStorageKey = "pebble-garden-best-moves";
+const soundStorageKey = "pebble-garden-sound";
+const hapticsStorageKey = "pebble-garden-haptics";
 const flowerBedKeys = new Set(["1,2", "2,2", "2,3", "3,2", "3,3", "4,3"]);
 const traySchedule = [
   ["red", "blue", "green"],
@@ -40,6 +42,9 @@ let movesUsed = 0;
 let lastBloomKeys;
 let lastGrowthKeys;
 let gameOver = false;
+let audioContext;
+let soundEnabled = readBooleanSetting(soundStorageKey, true);
+let hapticsEnabled = readBooleanSetting(hapticsStorageKey, true);
 
 const boardEl = document.querySelector("#board");
 const trayEl = document.querySelector("#tray");
@@ -61,6 +66,12 @@ const resultGrowthEl = document.querySelector("#result-growth");
 const resultFlowEl = document.querySelector("#result-flow");
 const resultBestEl = document.querySelector("#result-best");
 const playAgainButton = document.querySelector("#play-again");
+const menuButton = document.querySelector("#menu-button");
+const settingsBackdropEl = document.querySelector("#settings-backdrop");
+const soundToggleEl = document.querySelector("#sound-toggle");
+const hapticsToggleEl = document.querySelector("#haptics-toggle");
+const resumeGameButton = document.querySelector("#resume-game");
+const restartGameButton = document.querySelector("#restart-game");
 
 function newGame() {
   board = createBoard();
@@ -78,6 +89,7 @@ function newGame() {
   selectedIndex = 0;
   gameOver = false;
   resultBackdropEl.hidden = true;
+  settingsBackdropEl.hidden = true;
 
   board[2][2] = "red";
   board[2][3] = "red";
@@ -236,11 +248,13 @@ function placePebble(row, col) {
     lastGrowthKeys = new Set(clearResult.growthKeys);
     score += clearResult.cleared * 15 + clearResult.bedsGrown * 25 + clearResult.flowersGrown * 50 + bonus + streak * 12;
     setClearMessage(clearResult, streak);
+    playGameSound(clearResult.flowersGrown > 0 ? "bloom" : clearResult.bedsGrown > 0 ? "grow" : "clear");
     pulseHaptic();
   } else {
     streak = 0;
     score += 1;
     setMessage("Pebble placed. No bed grew.");
+    playGameSound("place");
   }
 
   if (tray.length === 0) {
@@ -491,6 +505,65 @@ function writeBestMoves(value) {
   }
 }
 
+function openSettings() {
+  soundToggleEl.checked = soundEnabled;
+  hapticsToggleEl.checked = hapticsEnabled;
+  settingsBackdropEl.hidden = false;
+  resumeGameButton.focus();
+}
+
+function closeSettings() {
+  settingsBackdropEl.hidden = true;
+  menuButton.focus();
+}
+
+function readBooleanSetting(key, fallback) {
+  try {
+    const storedValue = window.localStorage.getItem(key);
+    return storedValue === null ? fallback : storedValue === "true";
+  } catch {
+    return fallback;
+  }
+}
+
+function writeBooleanSetting(key, value) {
+  try {
+    window.localStorage.setItem(key, String(value));
+  } catch {
+    // Settings remain available for the current session without browser storage.
+  }
+}
+
+function playGameSound(kind) {
+  if (!soundEnabled) return;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+
+  audioContext ??= new AudioContextClass();
+  const patterns = {
+    place: [[210, 0]],
+    clear: [[390, 0], [470, 0.05]],
+    grow: [[430, 0], [590, 0.07]],
+    bloom: [[520, 0], [690, 0.08], [820, 0.15]],
+  };
+  const notes = patterns[kind] || patterns.place;
+
+  notes.forEach(([frequency, delay]) => {
+    const start = audioContext.currentTime + delay;
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(frequency, start);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.06, start + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.15);
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(start);
+    oscillator.stop(start + 0.16);
+  });
+}
+
 function setClearMessage({ bedsGrown, cleared, flowersGrown }, flow) {
   const flowText = flow > 1 ? ` Flow x${flow}.` : "";
   if (flowersGrown > 0) {
@@ -508,11 +581,24 @@ function setMessage(text) {
 }
 
 function pulseHaptic() {
-  if ("vibrate" in navigator) {
+  if (hapticsEnabled && "vibrate" in navigator) {
     navigator.vibrate(18);
   }
 }
 
 newGameButton.addEventListener("click", newGame);
 playAgainButton.addEventListener("click", newGame);
+menuButton.addEventListener("click", openSettings);
+resumeGameButton.addEventListener("click", closeSettings);
+restartGameButton.addEventListener("click", newGame);
+soundToggleEl.addEventListener("change", () => {
+  soundEnabled = soundToggleEl.checked;
+  writeBooleanSetting(soundStorageKey, soundEnabled);
+  if (soundEnabled) playGameSound("grow");
+});
+hapticsToggleEl.addEventListener("change", () => {
+  hapticsEnabled = hapticsToggleEl.checked;
+  writeBooleanSetting(hapticsStorageKey, hapticsEnabled);
+  pulseHaptic();
+});
 newGame();
