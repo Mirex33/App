@@ -78,6 +78,9 @@ Feedback:
 
 - Stronger visual pulses fire when a bed sprouts or blooms.
 - Consecutive bed-growing moves build a small Flow streak.
+- Finished rounds receive one to three garden marks based on moves remaining.
+- The result panel shows moves used, bed-clearing moves, best Flow, and a local personal best.
+- Failed rounds show the exact number of flowers still needed and invite an immediate retry.
 
 Failure:
 
@@ -113,7 +116,7 @@ Current prototype variant:
 
 - compact target mode with 4 marked beds and 14 moves.
 
-Next, prototype two feel variants:
+Next, measure whether players understand the goal and choose to retry after a near miss. Then prototype two feel variants:
 
 - relaxed endless score mode,
 - daily seeded board with a flower target.
