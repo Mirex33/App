@@ -45,6 +45,7 @@ Assets:
 - `design/assets/game/pebble-purple.png`
 - `design/assets/game/sprout.png`
 - `design/assets/game/flower.png`
+- `design/assets/game/garden-soil-texture.png`
 
 Art direction:
 
@@ -54,6 +55,8 @@ Art direction:
 - warm upper-left lighting,
 - bold silhouettes that remain readable around 40 pixels,
 - restrained texture and no decorative scene elements.
+
+The board uses the generated soil as one continuous play surface. Subtle pressed pockets replace the previous card-like cells, while flower beds use soft planted rims and deeper soil shadows. A restrained raised frame keeps the board legible without returning to a schematic grid.
 
 The current generator output includes a baked checkerboard backdrop rather than a true alpha channel. The browser prototype safely crops the pebble art inside existing oval masks and crops the botanical art inside compact silhouettes. Before native production, regenerate or properly extract clean-alpha master assets.
 

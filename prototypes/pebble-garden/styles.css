@@ -291,17 +291,48 @@ h1 {
 }
 
 .board-wrap {
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  background: linear-gradient(180deg, #e8ddcc, #d7c8b4);
+  position: relative;
+  isolation: isolate;
+  padding: 15px;
+  border: 1px solid rgba(57, 68, 54, 0.34);
+  border-radius: 20px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.26), transparent 38%),
+    repeating-linear-gradient(96deg, rgba(44, 57, 43, 0.05) 0 2px, transparent 2px 12px),
+    #828977;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -5px 0 rgba(45, 55, 42, 0.18),
+    0 12px 24px rgba(59, 63, 50, 0.16);
+}
+
+.board-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  z-index: -1;
+  border: 1px solid rgba(63, 45, 28, 0.24);
+  border-radius: 13px;
+  box-shadow:
+    inset 0 3px 8px rgba(54, 38, 23, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .board {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 7px;
+  gap: 3px;
   aspect-ratio: 1;
+  padding: 6px;
+  border-radius: 10px;
+  background:
+    linear-gradient(rgba(95, 72, 49, 0.05), rgba(66, 47, 29, 0.12)),
+    url("../../design/assets/game/garden-soil-texture.png") center / cover;
+  box-shadow:
+    inset 0 4px 10px rgba(61, 43, 26, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+  overflow: hidden;
 }
 
 .cell {
@@ -309,33 +340,65 @@ h1 {
   display: grid;
   min-width: 0;
   place-items: center;
-  border: 1px solid rgba(90, 72, 46, 0.1);
-  border-radius: 15px;
-  background:
-    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.28), transparent 30%),
-    var(--soil);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
   cursor: default;
-  overflow: hidden;
+  overflow: visible;
+  transition: transform 140ms ease;
 }
 
-.cell.bed {
+.cell::before {
+  content: "";
+  position: absolute;
+  inset: 20%;
+  border-radius: 48% 52% 47% 53% / 54% 46% 54% 46%;
+  background:
+    radial-gradient(circle at 42% 35%, rgba(255, 255, 255, 0.09), transparent 40%),
+    rgba(91, 66, 41, 0.04);
   box-shadow:
-    inset 0 0 0 2px rgba(47, 138, 104, 0.34),
-    inset 0 0 18px rgba(47, 138, 104, 0.08);
+    inset 0 2px 4px rgba(55, 37, 21, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+  opacity: 0.72;
+  transition: inset 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
-.cell.growth-1 {
-  background:
-    radial-gradient(circle at 50% 54%, rgba(86, 166, 109, 0.22), transparent 34%),
-    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.28), transparent 30%),
-    var(--soil);
+.cell:nth-child(3n)::before {
+  border-radius: 52% 48% 55% 45% / 46% 53% 47% 54%;
+  transform: rotate(3deg);
 }
 
-.cell.growth-2 {
+.cell:nth-child(4n)::before {
+  border-radius: 45% 55% 48% 52% / 52% 47% 53% 48%;
+  transform: rotate(-4deg);
+}
+
+.cell.bed::before {
+  inset: 7%;
+  opacity: 1;
   background:
-    radial-gradient(circle at 50% 55%, rgba(213, 167, 67, 0.2), transparent 42%),
-    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.28), transparent 30%),
-    #ddcfba;
+    radial-gradient(circle at 45% 40%, rgba(255, 255, 255, 0.1), transparent 34%),
+    radial-gradient(circle, rgba(70, 53, 34, 0.22) 0 52%, rgba(86, 166, 109, 0.2) 54% 62%, transparent 65%);
+  box-shadow:
+    inset 0 2px 5px rgba(48, 34, 21, 0.28),
+    0 0 0 1px rgba(58, 91, 57, 0.18),
+    0 2px 4px rgba(47, 60, 38, 0.1);
+}
+
+.cell.growth-1::before {
+  inset: 7%;
+  opacity: 1;
+  background:
+    radial-gradient(circle at 45% 38%, rgba(255, 255, 255, 0.12), transparent 32%),
+    radial-gradient(circle, rgba(62, 49, 31, 0.26) 0 49%, rgba(86, 166, 109, 0.34) 52% 64%, transparent 67%);
+}
+
+.cell.growth-2::before {
+  inset: 7%;
+  opacity: 1;
+  background:
+    radial-gradient(circle at 45% 38%, rgba(255, 255, 255, 0.13), transparent 32%),
+    radial-gradient(circle, rgba(62, 49, 31, 0.24) 0 47%, rgba(213, 167, 67, 0.32) 50% 64%, transparent 67%);
 }
 
 .cell.empty {
@@ -345,38 +408,62 @@ h1 {
 .cell.empty::after {
   content: "";
   position: absolute;
-  inset: 26%;
+  inset: 43%;
   border-radius: 50%;
-  background: rgba(104, 88, 62, 0.1);
+  background: rgba(55, 38, 22, 0.2);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.09);
+  transition: inset 140ms ease, background 140ms ease, opacity 140ms ease;
+}
+
+.cell.empty:hover::before {
+  inset: 12%;
+  opacity: 1;
+  background:
+    radial-gradient(circle at 42% 35%, rgba(255, 255, 255, 0.12), transparent 40%),
+    rgba(86, 166, 109, 0.14);
+  box-shadow:
+    inset 0 2px 5px rgba(55, 37, 21, 0.2),
+    0 0 0 2px rgba(86, 166, 109, 0.2);
 }
 
 .cell.preview-clear {
-  border-color: var(--preview-color);
+  box-shadow: none;
+}
+
+.cell.preview-clear::before {
   box-shadow:
     inset 0 0 0 2px var(--preview-color),
-    0 9px 20px rgba(47, 138, 104, 0.1);
+    inset 0 3px 7px rgba(55, 37, 21, 0.18),
+    0 4px 10px rgba(47, 138, 104, 0.14);
 }
 
 .cell.preview-clear.empty::after {
-  inset: 38%;
+  inset: 40%;
   background: var(--preview-color);
   opacity: 0.72;
 }
 
 .cell.preview-grow {
+  box-shadow: none;
+}
+
+.cell.preview-grow::before {
   box-shadow:
     inset 0 0 0 2px var(--focus),
     0 0 0 3px rgba(47, 138, 104, 0.14),
-    inset 0 0 18px rgba(47, 138, 104, 0.12);
+    inset 0 3px 8px rgba(47, 85, 62, 0.2);
 }
 
 .cell.preview-bloom {
-  border-color: #d5a743;
   animation: previewPulse 900ms ease-in-out infinite;
+  box-shadow: none;
+}
+
+.cell.preview-bloom::before {
   box-shadow:
     inset 0 0 0 2px #d5a743,
     0 0 0 4px rgba(213, 167, 67, 0.2),
-    inset 0 0 18px rgba(213, 167, 67, 0.18);
+    inset 0 3px 8px rgba(107, 82, 31, 0.2);
 }
 
 .cell.growth-1.empty::after,
